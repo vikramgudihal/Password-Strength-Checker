@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecurePass — Password Strength Checker & Generator</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <svg class="brand-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span class="brand-name">SecurePass</span>
+        <span class="brand-tag">Audit & Gen</span>
+      </div>
+      <div class="nav-controls">
+        <button type="button" id="themeToggleBtn" class="theme-btn" aria-label="Toggle theme">
+          <svg class="theme-icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <span class="theme-label">Light</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <div class="content-wrapper">
+
+      <!-- Header Section -->
+      <div class="page-header">
+        <div class="header-badge">
+          <span class="badge-dot"></span>
+          <span>Local in-memory execution &bull; Zero network transmission &bull; Never stored</span>
+        </div>
+        <h1 class="main-heading">Password Security & Generator</h1>
+        <p class="header-desc">
+          Audit password resistance against dictionary attacks, or generate high-entropy passwords that defeat brute-force tools.
+        </p>
+      </div>
+
+      <!-- Main Container Card -->
+      <div id="audit" class="audit-card">
+        
+        <!-- Navigation Tabs: Check vs Create Strong Password -->
+        <div class="view-tabs">
+          <button type="button" id="tabCheckBtn" class="tab-btn active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Check Password</span>
+          </button>
+          <button type="button" id="tabGenerateBtn" class="tab-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Create Strong Password</span>
+          </button>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 1: CHECK PASSWORD (Live analysis, No Analyze button) -->
+        <!-- ======================================================== -->
+        <div id="checkView" class="tab-view active-view">
+          
+          <div class="input-section">
+            <div class="input-label-row">
+              <label for="passwordInput" class="input-label">Password</label>
+              <span class="live-hint">Live in-memory analysis as you type</span>
+            </div>
+            <div class="input-group">
+              <input 
+                type="password" 
+                id="passwordInput" 
+                class="password-input" 
+                placeholder="Type a password to test..." 
+                autocomplete="off" 
+                spellcheck="false"
+              >
+              <button type="button" id="toggleVisibilityBtn" class="input-action-btn" aria-label="Show password">Show</button>
+            </div>
+          </div>
+
+          <div class="btn-toolbar">
+            <button type="button" id="resetBtn" class="btn btn-secondary">Clear</button>
+            <button type="button" id="quickGenLink" class="btn btn-link">Need a strong password? Create one &rarr;</button>
+          </div>
+
+          <!-- Results Section: Hidden until input -->
+          <div id="resultsSection" class="results-section hidden">
+            
+            <!-- Summary Header (Side-by-Side: Gauge + Metrics Strip) -->
+            <div class="summary-card">
+              <div class="gauge-col">
+                <div class="radial-gauge-wrapper">
+                  <svg class="radial-svg" width="120" height="120" viewBox="0 0 120 120">
+                    <circle class="radial-bg" cx="60" cy="60" r="52"></circle>
+                    <circle id="radialRing" class="radial-ring" cx="60" cy="60" r="52"></circle>
+                  </svg>
+                  <div class="radial-center">
+                    <span id="scoreValue" class="radial-score">0</span>
+                    <span class="radial-denom">/ 100</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="summary-details">
+                <div class="summary-title-row">
+                  <span class="summary-label">Strength Rating</span>
+                  <span id="strengthLabel" class="strength-badge">Very Weak</span>
+                </div>
+                
+                <!-- 3-Column Telemetry Strip -->
+                <div class="telemetry-strip">
+                  <div class="telemetry-cell">
+                    <span class="cell-label">Offline Crack Time</span>
+                    <span id="crackTimeValue" class="cell-value">Instantly</span>
+                  </div>
+                  <div class="telemetry-cell">
+                    <span class="cell-label">Shannon Entropy</span>
+                    <span id="entropyValue" class="cell-value">0 bits</span>
+                  </div>
+                  <div class="telemetry-cell">
+                    <span class="cell-label">Pool Search Space</span>
+                    <span id="poolEntropyValue" class="cell-value">0 bits</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section: Audit Checks (Clean Linear Table / List) -->
+            <div class="audit-section">
+              <div class="section-heading">
+                <h2 class="section-title">Diagnostic Checks</h2>
+                <span class="section-subtext">6 security parameters analyzed</span>
+              </div>
+
+              <div class="check-list">
+                
+                <!-- Row 1: Length -->
+                <div id="lengthResult" class="check-row status-fail">
+                  <div class="check-status-icon">
+                    <svg class="icon-pass" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg class="icon-fail" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg class="icon-warn" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                  </div>
+                  <div class="check-main">
+                    <div class="check-title">Character Length</div>
+                    <div class="check-detail analysis-desc">Too short (less than 8 characters).</div>
+                  </div>
+                  <div class="check-badge-wrap">
+                    <span class="status-pill pill-fail">Fail</span>
+                  </div>
+                </div>
+
+                <!-- Row 2: Variety -->
+                <div id="varietyResult" class="check-row status-fail">
+                  <div class="check-status-icon">
+                    <svg class="icon-pass" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg class="icon-fail" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg class="icon-warn" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                  </div>
+                  <div class="check-main">
+                    <div class="check-title">Character Diversity</div>
+                    <div class="check-detail analysis-desc">No characters provided.</div>
+                  </div>
+                  <div class="check-badge-wrap">
+                    <span class="status-pill pill-fail">Fail</span>
+                  </div>
+                </div>
+
+                <!-- Row 3: Dictionary & Personal Names -->
+                <div id="dictResult" class="check-row status-pass">
+                  <div class="check-status-icon">
+                    <svg class="icon-pass" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg class="icon-fail" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg class="icon-warn" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                  </div>
+                  <div class="check-main">
+                    <div class="check-title">Dictionary & Personal Names</div>
+                    <div class="check-detail analysis-desc">No common dictionary words detected.</div>
+                  </div>
+                  <div class="check-badge-wrap">
+                    <span class="status-pill pill-pass">Pass</span>
+                  </div>
+                </div>
+
+                <!-- Row 4: Repeated Characters -->
+                <div id="repeatsResult" class="check-row status-pass">
+                  <div class="check-status-icon">
+                    <svg class="icon-pass" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg class="icon-fail" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg class="icon-warn" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                  </div>
+                  <div class="check-main">
+                    <div class="check-title">Repeated Sequences</div>
+                    <div class="check-detail analysis-desc">No repeated character patterns detected.</div>
+                  </div>
+                  <div class="check-badge-wrap">
+                    <span class="status-pill pill-pass">Pass</span>
+                  </div>
+                </div>
+
+                <!-- Row 5: Sequential & Hybrid Masks -->
+                <div id="sequencesResult" class="check-row status-pass">
+                  <div class="check-status-icon">
+                    <svg class="icon-pass" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg class="icon-fail" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg class="icon-warn" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                  </div>
+                  <div class="check-main">
+                    <div class="check-title">Keyboard Walks & Hybrid Masks</div>
+                    <div class="check-detail analysis-desc">No predictable sequences detected.</div>
+                  </div>
+                  <div class="check-badge-wrap">
+                    <span class="status-pill pill-pass">Pass</span>
+                  </div>
+                </div>
+
+                <!-- Row 6: Substitutions -->
+                <div id="substitutionsResult" class="check-row status-pass">
+                  <div class="check-status-icon">
+                    <svg class="icon-pass" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg class="icon-fail" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg class="icon-warn" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                  </div>
+                  <div class="check-main">
+                    <div class="check-title">Leetspeak Substitutions</div>
+                    <div class="check-detail analysis-desc">No disguised substitutions detected.</div>
+                  </div>
+                  <div class="check-badge-wrap">
+                    <span class="status-pill pill-pass">Pass</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Section: Recommendations (Clean Structured Advisory) -->
+            <div class="recommendations-section">
+              <div class="section-heading">
+                <h2 class="section-title">Security Recommendations</h2>
+              </div>
+              <div id="recommendationsList" class="recommendations-container">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- VIEW 2: CREATE STRONG PASSWORD (With Info Collection)    -->
+        <!-- ======================================================== -->
+        <div id="generateView" class="tab-view hidden-view">
+          
+          <div class="gen-intro">
+            <h2 class="gen-title">Create a High-Entropy Strong Password</h2>
+            <p class="gen-desc">
+              Generate credentials using browser Cryptographically Secure Pseudo-Random Number Generation (CSPRNG).
+            </p>
+          </div>
+
+          <!-- Mode Selector for Generator -->
+          <div class="gen-mode-pills">
+            <button type="button" class="mode-pill active" data-gen="passphrase">
+              <span class="pill-title">4-Word Passphrase</span>
+              <span class="pill-badge">NIST SP 800-63B</span>
+            </button>
+            <button type="button" class="mode-pill" data-gen="random">
+              <span class="pill-title">Random Characters</span>
+              <span class="pill-badge">High Complexity</span>
+            </button>
+            <button type="button" class="mode-pill" data-gen="custom">
+              <span class="pill-title">Collect Info &amp; Defend</span>
+              <span class="pill-badge">Personal Memory Cues</span>
+            </button>
+          </div>
+
+          <!-- Config Panel 1: Passphrase (Recommended) -->
+          <div id="cfgPassphrase" class="cfg-panel">
+            <div class="cfg-row">
+              <div class="cfg-label-row">
+                <label for="wordCountSlider" class="cfg-label">Word Count</label>
+                <span id="wordCountDisplay" class="cfg-value">4 words (~70 bits entropy)</span>
+              </div>
+              <input type="range" id="wordCountSlider" min="3" max="6" value="4" class="slider-ctrl">
+            </div>
+
+            <div class="cfg-grid-two">
+              <div class="cfg-field">
+                <label for="sepSelect" class="cfg-label">Word Separator</label>
+                <select id="sepSelect" class="ctrl-select">
+                  <option value="-">Hyphen (-)</option>
+                  <option value=".">Period (.)</option>
+                  <option value="_">Underscore (_)</option>
+                  <option value=" ">Space ( )</option>
+                </select>
+              </div>
+              <div class="cfg-checkbox-col">
+                <label class="ctrl-checkbox">
+                  <input type="checkbox" id="addNumOption" checked>
+                  <span>Append random 2-digit number</span>
+                </label>
+                <label class="ctrl-checkbox">
+                  <input type="checkbox" id="capWordsOption" checked>
+                  <span>Capitalize each word</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Config Panel 2: Random Characters -->
+          <div id="cfgRandom" class="cfg-panel hidden-panel">
+            <div class="cfg-row">
+              <div class="cfg-label-row">
+                <label for="charLenSlider" class="cfg-label">Character Length</label>
+                <span id="charLenDisplay" class="cfg-value">16 characters</span>
+              </div>
+              <input type="range" id="charLenSlider" min="12" max="32" value="16" class="slider-ctrl">
+            </div>
+
+            <div class="cfg-checkbox-grid">
+              <label class="ctrl-checkbox"><input type="checkbox" id="chkUpper" checked> <span>Uppercase (A-Z)</span></label>
+              <label class="ctrl-checkbox"><input type="checkbox" id="chkLower" checked> <span>Lowercase (a-z)</span></label>
+              <label class="ctrl-checkbox"><input type="checkbox" id="chkNumbers" checked> <span>Numbers (0-9)</span></label>
+              <label class="ctrl-checkbox"><input type="checkbox" id="chkSymbols" checked> <span>Symbols (!@#$%)</span></label>
+            </div>
+          </div>
+
+          <!-- Config Panel 3: Personalized & Hardened (Collects Info) -->
+          <div id="cfgCustom" class="cfg-panel hidden-panel">
+            <div class="info-collect-wrapper">
+              <div class="info-fields-grid">
+                <div class="cfg-field">
+                  <label for="customWordInput" class="cfg-label">1. Word, Name, or Hobby (Memory Cue)</label>
+                  <input type="text" id="customWordInput" class="ctrl-text" placeholder="e.g. coffee, hiking, or falcon" autocomplete="off" value="coffee">
+                </div>
+                <div class="cfg-field">
+                  <label for="customNumInput" class="cfg-label">2. Memorable Number or Year</label>
+                  <input type="text" id="customNumInput" class="ctrl-text" placeholder="e.g. 2024 or 77" autocomplete="off" value="2024">
+                </div>
+              </div>
+
+              <div class="info-options-grid">
+                <div class="cfg-field">
+                  <label for="customSepSelect" class="cfg-label">3. Separator Symbol</label>
+                  <select id="customSepSelect" class="ctrl-select">
+                    <option value="-">Hyphen (-)</option>
+                    <option value=".">Period (.)</option>
+                    <option value="_">Underscore (_)</option>
+                    <option value="!">Exclamation mark (!)</option>
+                    <option value="#">Hash symbol (#)</option>
+                    <option value="@">At symbol (@)</option>
+                  </select>
+                </div>
+                <div class="cfg-field">
+                  <label for="customStyleSelect" class="cfg-label">4. Defense Hardening Style</label>
+                  <select id="customStyleSelect" class="ctrl-select">
+                    <option value="passphrase">NIST High-Entropy Passphrase (Blends Random Words)</option>
+                    <option value="salted">CSPRNG Cryptographic Salt (High Complexity Chars)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Threat Comparison & Education Banner -->
+              <div class="threat-comparison-box">
+                <div class="threat-row naive-threat">
+                  <div class="threat-icon-col">
+                    <span class="threat-badge-warn">ATTACKER TARGET</span>
+                  </div>
+                  <div class="threat-content">
+                    <div class="threat-title">Why Naive Personal Info Fails:</div>
+                    <div class="threat-preview">
+                      <code id="naivePreviewText" class="threat-code">coffee@2024</code>
+                      <span class="threat-danger-pill">&lt; 0.1s crack time via Hashcat mask</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="threat-row defense-solution">
+                  <div class="threat-icon-col">
+                    <span class="threat-badge-secure">BLUE TEAM DEFENSE</span>
+                  </div>
+                  <div class="threat-content">
+                    <div class="threat-title">How Defensive Cybersecurity Secures Your Info:</div>
+                    <div class="threat-desc">
+                      Your memory cues are preserved, but cryptographically interleaved with CSPRNG random words or salts. This pushes the search space beyond <strong>2<sup>80</sup> combinations</strong> (&gt;100 billion years to crack offline).
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Generated Password Display Box -->
+          <div class="output-card">
+            <div class="output-row">
+              <input type="text" id="generatedOutput" class="output-text" readonly>
+              <button type="button" id="copyPasswordBtn" class="btn btn-primary btn-copy" title="Copy to clipboard">
+                <span id="copyBtnText">Copy</span>
+              </button>
+            </div>
+            <div class="output-meta">
+              <span class="meta-tag-secure">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Cryptographically Secure &bull; High Entropy</span>
+              </span>
+              <span id="genEntropyText" class="meta-entropy-label">~72.4 bits entropy</span>
+            </div>
+          </div>
+
+          <!-- Generator Action Toolbar -->
+          <div class="gen-action-bar">
+            <button type="button" id="generateNewBtn" class="btn btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Generate New Password</span>
+            </button>
+            <button type="button" id="testInAuditBtn" class="btn btn-secondary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>Test in Strength Checker &rarr;</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Clean Minimalist Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <span>&copy; Vikram G — SecurePass</span>
+    </div>
+  </footer>
+
+  <script src="js/wordlist.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
