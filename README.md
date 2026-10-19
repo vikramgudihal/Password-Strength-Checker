@@ -73,6 +73,12 @@ xdg-open index.html     # Linux
 
 ---
 
+
+<img width="1471" height="729" alt="image" src="https://github.com/user-attachments/assets/532033f8-2eb4-4d02-851e-ab9950d0d8e1" /> <br><br><br>
+<img width="1454" height="726" alt="image" src="https://github.com/user-attachments/assets/2fcf17d0-fbb1-47e7-95db-2845dfdd607c" />
+
+
+
 ## 4. How to Run the Python CLI
 
 For a terminal-based security audit with silent credential input:
